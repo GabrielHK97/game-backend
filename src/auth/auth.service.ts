@@ -31,9 +31,10 @@ export class AuthService {
         });
       }
     } catch (error) {
+      console.log(error)
       return new ServiceData<void>(
         HttpStatus.BAD_REQUEST,
-        'Could not create account!',
+        'Could not login!',
       );
     }
   }

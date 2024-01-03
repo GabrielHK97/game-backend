@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import * as io from 'socket.io';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -11,6 +12,7 @@ async function bootstrap() {
     credentials: true,
   };
   app.enableCors(options);
-  await app.listen(3000);
+  await app.listen(3001);
 }
+
 bootstrap();

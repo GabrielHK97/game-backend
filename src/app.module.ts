@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AccountModule } from './account/account.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Account } from './account/entities/account.entity';
 import { AuthModule } from './auth/auth.module';
@@ -14,11 +13,10 @@ import { AuthModule } from './auth/auth.module';
       port: 5432,
       username: 'postgres',
       password: 'postgres',
-      database: 'game',
+      database: 'postgres',
       entities: [Account],
       synchronize: false,
     }),
-    AccountModule,
     AuthModule,
   ],
   controllers: [AppController],
