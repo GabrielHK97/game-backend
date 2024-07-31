@@ -9,7 +9,10 @@ import { Request } from 'express';
 import { ServiceData } from 'src/utils/classes/service-data.class';
 import { extractTokenFromHeader } from 'src/utils/functions/extract-token-from-header.function';
 import { Account } from 'src/resources/account/entities/account.entity';
-import { IAuthenticationToken } from 'src/utils/interfaces/authentication-token.interface';
+
+interface IAuthenticationToken {
+  token: string;
+}
 
 @Injectable()
 export class AuthService {
@@ -33,7 +36,6 @@ export class AuthService {
       }
       return new ServiceData<IAuthenticationToken>(HttpStatus.BAD_REQUEST, 'Login failed!');
     } catch (error) {
-      console.log(error);
       return new ServiceData<IAuthenticationToken>(HttpStatus.BAD_REQUEST, 'Login failed!');
     }
   }
@@ -48,5 +50,19 @@ export class AuthService {
       .catch(() => {
         return new ServiceData(HttpStatus.UNAUTHORIZED, 'Could not authenticate!');
       });
+  }
+
+  async getAccount(req: Request): Promise<ServiceData<Account>> {
+    const token = extractTokenFromHeader(req.headers.cookie);
+    try {
+      const payload = this.jwtService.verify(token);
+      const userId = payload.id;
+      const account = await this.accountRepository.findOneByOrFail({
+        id: userId
+      });
+      return new ServiceData(HttpStatus.OK, 'Account Data!', account);
+    } catch (error) {
+      return new ServiceData(HttpStatus.UNAUTHORIZED, 'Could not find account!');
+    }
   }
 }

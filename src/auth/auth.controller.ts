@@ -44,5 +44,14 @@ import {
       const response = await this.authService.authenticate(req);
       return res.status(response.status).send(response.getMetadata());
     }
+
+    @Get('/user')
+    async getAccount(
+      @Req() req: Request,
+      @Res() res: Response,
+    ): Promise<Response> {
+      const response = await this.authService.getAccount(req);
+      return res.status(response.status).send(response.getMetadata());
+    }
   }
   
