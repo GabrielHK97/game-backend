@@ -7,8 +7,8 @@ import * as dotenv from 'dotenv'
 import { AuthModule } from './auth/auth.module';
 import { EventsModule } from './utils/events/events.module';
 import { Account } from './resources/account/entities/account.entity';
-import { RedisModule } from '@nestjs-modules/ioredis';
 import { LobbyModule } from './resources/lobby/lobby.module';
+import { RedisModule } from './redis/redis.module';
   
 dotenv.config();
 

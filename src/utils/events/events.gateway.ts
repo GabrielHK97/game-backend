@@ -28,8 +28,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly jwtService: JwtService) {}
 
   async handleConnection(client: Socket) {
-    const token = extractTokenFromHeader(client.handshake.headers.cookie);
     try {
+      const token = extractTokenFromHeader(client.handshake.headers.cookie);
       const payload = this.jwtService.verify(token);
       const userId = payload.id;
 

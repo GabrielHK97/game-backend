@@ -20,11 +20,15 @@ function getAge(birthdate: Date): string {
 }
 
 export class AccountConverter {
-    static userToUserDetailsDto(account: Account) {
+    static accountToAccountDetailsDto(account: Account) {
         const dto = new AccountDetailsDto();
+        dto.id = account.id;
         dto.name = account.name;
-        dto.age = getAge(account.birthDate);
+        dto.username = account.username;
+        dto.birthDate = account.birthDate;
+        dto.age = getAge(new Date(account.birthDate));
         dto.sex = account.sex;
+        dto.email = account.email;
         return dto;
     }
 }

@@ -51,18 +51,4 @@ export class AuthService {
         return new ServiceData(HttpStatus.UNAUTHORIZED, 'Could not authenticate!');
       });
   }
-
-  async getAccount(req: Request): Promise<ServiceData<Account>> {
-    const token = extractTokenFromHeader(req.headers.cookie);
-    try {
-      const payload = this.jwtService.verify(token);
-      const userId = payload.id;
-      const account = await this.accountRepository.findOneByOrFail({
-        id: userId
-      });
-      return new ServiceData(HttpStatus.OK, 'Account Data!', account);
-    } catch (error) {
-      return new ServiceData(HttpStatus.UNAUTHORIZED, 'Could not find account!');
-    }
-  }
 }

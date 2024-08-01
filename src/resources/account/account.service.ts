@@ -10,6 +10,7 @@ import { AccountConverter } from './converter/account.converter';
 import { SexEnum } from 'src/utils/enum/sex.enum';
 import { Request } from 'express';
 import { extractTokenFromHeader } from 'src/utils/functions/extract-token-from-header.function';
+import { JwtService } from '@nestjs/jwt';
 
 interface CanCreateAccountReturn {
   canCreate: boolean;
@@ -21,6 +22,7 @@ export class AccountService {
   constructor(
     @InjectRepository(Account)
     private accountRepository: Repository<Account>,
+    private readonly jwtService: JwtService
   ) {}
 
   async alreadyHasUsername(username: string): Promise<boolean> {
@@ -127,20 +129,21 @@ export class AccountService {
     }
   }
 
-  async findUser(req: Request) {
+  async getAccount(req: Request) {
     try {
       const token = extractTokenFromHeader(req.headers.cookie);
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const account = await this.accountRepository.findOneBy({ id: payload.id });
+      const payload = this.jwtService.verify(token);
+      const userId = payload.id;
+      const account = await this.accountRepository.findOneBy({ id: userId });
       return new ServiceData<AccountDetailsDto>(
         HttpStatus.OK,
-        'Dados de usuário achados!',
-        AccountConverter.userToUserDetailsDto(account),
+        'Account found!',
+        AccountConverter.accountToAccountDetailsDto(account),
       );
     } catch (error) {
       return new ServiceData<void>(
         HttpStatus.BAD_REQUEST,
-        'Não pode achar usuário!',
+        'Account not found!',
       );
     }
   }

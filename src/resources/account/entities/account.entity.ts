@@ -4,19 +4,11 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class Account {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: string;
 
   @Column({
     type: 'date',
     nullable: false,
-    // transformer: {
-    //   from(value: string) {
-    //     return value.split('-').reverse().join('/');
-    //   },
-    //   to(value: string) {
-    //     return new Date(value  + 'T00:00:00');
-    //   },
-    // },
   })
   birthDate: Date;
 
