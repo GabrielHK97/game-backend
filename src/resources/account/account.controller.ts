@@ -6,6 +6,7 @@ import {
   Req,
   Get,
   UseGuards,
+  Param,
 } from '@nestjs/common';
 import { AccountService } from './account.service';
 import { CreateAccountDto } from './dto/create-account.dto';
@@ -24,8 +25,16 @@ export class AccountController {
 
   @UseGuards(AuthGuard)
   @Get()
-  async getAccount(@Req() req: Request, @Res() res: Response) {
-    const response = await this.accountService.getAccount(req);
+  async getOwnAccount(@Req() req: Request, @Res() res: Response) {
+    const response = await this.accountService.getOwnAccount(req);
+    return res.status(response.status).send(response.getMetadata());
+
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('/:id')
+  async getAccount(@Param('id') id: string, @Res() res: Response) {
+    const response = await this.accountService.getAccount(id);
     return res.status(response.status).send(response.getMetadata());
 
   }

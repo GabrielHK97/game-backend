@@ -32,6 +32,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const token = extractTokenFromHeader(client.handshake.headers.cookie);
       const payload = this.jwtService.verify(token);
       const userId = payload.id;
+      const username = payload.username;
 
       if (this.activeSessions.has(userId)) {
         const previousSessionId = this.activeSessions.get(userId);
@@ -40,7 +41,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       this.activeSessions.set(userId, client.id);
 
-      console.log(`User ${userId} connected with session ${client.id}`);
+      console.log(`User ${username} connected with session ${client.id}`);
     } catch (err) {
       client.disconnect();
     }

@@ -6,7 +6,9 @@ import {
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { LobbyService } from './lobby.service';
-import { CreateLobbyDto } from './dto/create-lobby.dto';
+import { LeaveLobbyDto } from './dto/leave-lobby.dto';
+import { DeleteLobbyDto } from './dto/delete-lobby.dto';
+import { GetLobbyDto } from './dto/get-lobby.dto';
 import { JoinLobbyDto } from './dto/join-lobby.dto';
 
 @WebSocketGateway()
@@ -16,27 +18,39 @@ export class LobbyGateway {
 
   constructor(private readonly lobbyService: LobbyService) {}
 
-  @SubscribeMessage('createLobby')
-  async handleCreateLobby(
-    @MessageBody() createLobbyDto: CreateLobbyDto,
-  ): Promise<void> {
-    const lobby = await this.lobbyService.create(createLobbyDto);
-    this.server.emit('lobbyCreated', lobby);
-    this.handleGetLobbies();
+  @SubscribeMessage('getLobbies')
+  async handleGetLobbies(): Promise<void> {
+    const lobbies = await this.lobbyService.getLobbies();
+    this.server.emit('gotLobbies', lobbies);
   }
 
   @SubscribeMessage('joinLobby')
   async handleJoinLobby(
-    @MessageBody() JoinLobbyDto: JoinLobbyDto,
+    @MessageBody() joinLobbyDto: JoinLobbyDto,
   ): Promise<void> {
-    const lobby = await this.lobbyService.join(JoinLobbyDto);
-    if (lobby.accountIds.length <= 2) this.server.emit('accountJoined', lobby);
+    const getLobbyDto: GetLobbyDto = {
+      id: joinLobbyDto.id,
+    };
+    const lobby = await this.lobbyService.get(getLobbyDto);
+    this.server.emit(`joinedLobby:${lobby.id}`, lobby);
     this.handleGetLobbies();
   }
 
-  @SubscribeMessage('getLobbies')
-  async handleGetLobbies(): Promise<void> {
-    const lobbies = await this.lobbyService.getLobbies();
-    this.server.emit('lobbies', lobbies);
+  @SubscribeMessage('leaveLobby')
+  async handleLeaveLobby(
+    @MessageBody() leaveLobbyDto: LeaveLobbyDto,
+  ): Promise<void> {
+    const lobby = await this.lobbyService.leave(leaveLobbyDto);
+    this.server.emit(`leftLobby:${lobby.id}`, lobby);
+    this.handleGetLobbies();
+  }
+
+  @SubscribeMessage('deleteLobby')
+  async handleDeleteLobby(
+    @MessageBody() deleteLobbyDto: DeleteLobbyDto,
+  ): Promise<void> {
+    const lobby = await this.lobbyService.delete(deleteLobbyDto);
+    this.server.emit(`deletedLobby:${lobby.id}`);
+    this.handleGetLobbies();
   }
 }

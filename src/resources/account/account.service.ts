@@ -125,16 +125,32 @@ export class AccountService {
 
       return new ServiceData<void>(HttpStatus.OK, 'Account created!');
     } catch (error) {
-      return new ServiceData<void>(HttpStatus.BAD_REQUEST, error.message);
+      return new ServiceData<void>(HttpStatus.BAD_REQUEST, 'Could not create Account');
     }
   }
 
-  async getAccount(req: Request) {
+  async getOwnAccount(req: Request) {
     try {
       const token = extractTokenFromHeader(req.headers.cookie);
       const payload = this.jwtService.verify(token);
-      const userId = payload.id;
-      const account = await this.accountRepository.findOneBy({ id: userId });
+      const accountId = payload.id;
+      const account = await this.accountRepository.findOneBy({ id: accountId });
+      return new ServiceData<AccountDetailsDto>(
+        HttpStatus.OK,
+        'Account found!',
+        AccountConverter.accountToAccountDetailsDto(account),
+      );
+    } catch (error) {
+      return new ServiceData<void>(
+        HttpStatus.BAD_REQUEST,
+        'Account not found!',
+      );
+    }
+  }
+
+  async getAccount(id: string) {
+    try {
+      const account = await this.accountRepository.findOneBy({ id });
       return new ServiceData<AccountDetailsDto>(
         HttpStatus.OK,
         'Account found!',
